@@ -1,0 +1,10 @@
+#dir
+.vscode/
+__pycache__/
+
+# files
+_1_controller.py
+_2_DB_csv.py
+app_backup.py
+test.py
+index_backup.html

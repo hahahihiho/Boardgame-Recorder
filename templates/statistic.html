@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>statistics</title>
+{% endblock %}
+
+{% block body %}
+<div id="top-link">
+    <a href="/">기록하기</a>
+    <a href="/showall">기록보기</a>
+</div>
+
+<table>
+    <tr>
+        <td>보드게임</td>
+        <td>플레이 횟수</td>
+    </tr>
+    {% for key, value in boardgame.items() %}
+    <tr>
+        <td><input type="text"  value={{key}}></td>
+        <td><input type="text"  value={{value}}></td>
+    </tr>
+    {% endfor %}
+
+    <tr>
+        <td>플레이어</td>
+        <td>플레이 횟수(참가횟수로 업데이트예정)</td>
+    </tr>
+    {% for key, value in nickname.items() %}
+    <tr>
+        <td><input type="text"  value={{key}}></td>
+        <td><input type="text"  value={{value}}></td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}
+
+    

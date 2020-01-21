@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>BoardGame Record</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<div id="top-link">
+    <a href="/showall">기록보기</a>
+    <a href="/statistic">통계보기</a>
+</div>
+
+
+<hr>
+<form action="/" method="POST">
+    <table id="myTable">
+        <tr>
+            <input style="text-align: center;" type="date" name="date" id="date"><br>
+        </tr>
+        <tr>
+            <td><input type="text" name='boardgame'></td>
+            <td><input type="text" name='players' placeholder="김찰스,털업,촷..."></td>
+        </tr>
+    </table>
+
+    <button type="button" onclick="myaddFunction()">add</button>
+    <button type="button" onclick="mydeleteFunction()">delete</button>
+    <br><input type="submit" value="기록">
+</form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    function myaddFunction() {
+        var table = document.getElementById("myTable");
+        var row = table.insertRow(-1);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        cell1.innerHTML = "<td><input type='text' name='boardgame'></td>";
+        cell2.innerHTML = "<td><input type='text' name='players' placeholder='김찰스,털업,촷...'></td>";
+    }
+    function mydeleteFunction() {
+        document.getElementById("myTable").deleteRow(-1);
+    }
+</script>
+{% endblock %}
+
+    
