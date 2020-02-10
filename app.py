@@ -8,109 +8,72 @@
 # 보드게임 record를 flask로 web에 구현
 # insert,update,delete,date-search,show-statistics 기능 구현
 # virtualenv or venv 와 gunicorn을 이용하여 heruko에 배포
+#
+# *** study more ***
+# ERD 바탕으로 db 모델링 최적화..
 ########################
 
 
-from flask import Flask,render_template,request,url_for,redirect
+from flask import Flask, render_template, request, url_for, redirect, jsonify, make_response
 import sqlite3
+import os
+import _2_DB as db
 import pandas as pd
 
 app=Flask(__name__)
 db_path = './db/boardgame.sql'
-table_name = 'BDRecorder'
-# data_tuple = ('date','boardgame','nickname')
-
-## this is for general sql_excuter(Future version)
-# def execute_sql(sql:str,keys:iter):
-#     print(sql,keys)
-#     data=c.execute(sql,keys)
-#     # select
-#     data=c.fetchall()
-#     return data
-
-def createTable():
-    conn=sqlite3.connect(db_path)
-    cur=conn.cursor()
-    sql='''    
-        create table if not exists {}(
-            idx INTEGER PRIMARY KEY AUTOINCREMENT,
-            date text,
-            boardgame text,
-            nickname text
-        )
-    '''.format(table_name)
-    cur.execute(sql)
-
-    conn.commit()
-    conn.close()
-
-def insertSQL(data):
-    conn=sqlite3.connect(db_path)
-    cur=conn.cursor()
-    sql='insert into {}(date,boardgame,nickname) values(?,?,?)'.format(table_name)
-    cur.execute(sql,data)
-
-    conn.commit()
-    conn.close()
-
-def selectAllSQL():
-    conn=sqlite3.connect(db_path)
-    cur=conn.cursor()
-    sql='select * from {}'.format(table_name)
-    cur.execute(sql)
-
-    customerList = cur.fetchall()
-
-    conn.commit()
-    conn.close()
-    return customerList
-
-def updateSQL(data):
-    conn=sqlite3.connect(db_path)
-    cur=conn.cursor()
-    sql='UPDATE {} SET date=?,boardgame=?,nickname=? WHERE idx=?'.format(table_name)
-    print(sql)
-    cur.execute(sql,data)
-
-    conn.commit()
-    conn.close()
-
-
-def deleteSQL(idx):
-    conn=sqlite3.connect(db_path)
-    cur=conn.cursor()
-    sql='DELETE FROM {} WHERE idx=?'.format(table_name)
-    cur.execute(sql,(idx,))
-
-    conn.commit()
-    conn.close()
-
-def selectSQL(date):
-    conn=sqlite3.connect(db_path)
-    cur=conn.cursor()
-    sql='select * from {} where date=?'.format(table_name)
-    cur.execute(sql,(date,))
-    data = cur.fetchall()
-    conn.commit()
-    conn.close()
-
-    return data
+if not os.path.exists(db_path):
+    db.createTable()
 
 # app
-@app.route('/',methods=['GET','POST'])
+# record page
+@app.route('/',methods=['GET'])
 def main():
-    if request.method=='GET':
-        return render_template('index.html')
-    else:
-        # 기록
-        date = request.form.get('date')
-        boardgame_list = request.form.getlist('boardgame')
-        players_list = request.form.getlist('players')
-        for boardgame,players in zip(boardgame_list,players_list):
-            player_list = players.split(',')
-            for nickname in player_list:
-                insertSQL([date,boardgame,nickname])
-        return redirect('/')
+    table = []
+    return render_template('index.html',table=table)
+
+
+@app.route('/date',methods=['POST'])
+def get_date():
+    req = request.get_json()
+    day_list=['일','월','화','수','목','금','토']
+    table = db.showDateTable(req)
+    day = day_list[req['day']]
+    output = {'table':table, 'day': day}
+
+    res = make_response(jsonify(output), 200)
+    print(req)
+    print(table)
+    print(type(res),res)
+    return res
+
+@app.route('/addRecord',methods=['POST'])
+def get_data():
+    req = request.get_json()
+    print('addRecord req : \n',req)
+    req['name_list'] = req['name_list'].split(',')
+    db.insertData(req)
+    output = db.showDateTable(req)
+    res = make_response(jsonify(output),200)
+    return res
+
+@app.route('/delRecord',methods=['POST'])
+def del_Record():
+    req = request.get_json()
+    print('delRecord req: \n',req)
+    db.delRecord_correctSeq(req)
+    output = db.showDateTable(req)
+    res = make_response(jsonify(output),200)
+    return res
+
+@app.route('/swapRecord',methods=['POST'])
+def swap_Record():
+    req = request.get_json()
+    print('swap_Record req: \n',req)
+    db.swapRecordSeq(req)
+    output = db.showDateTable(req)
+    res = make_response(jsonify(output),200)
+    return res
 
 @app.route('/showall', methods=['GET','POST'])
 def showall():
@@ -135,22 +98,53 @@ def showall():
 
         return redirect('/showall')
 
+# 통계 페이지
 @app.route('/statistic')
 def statistics():
-    data=selectAllSQL()
-    df = pd.DataFrame(data,columns=['idx','date','boardgame','nickname'])
-    print(df)
+    # data=selectAllSQL()
+    # df = pd.DataFrame(data,columns=['idx','date','boardgame','nickname'])
+    # print(df)
 
-    b_count=df.boardgame.value_counts()
-    n_count=df.nickname.value_counts()
-    print(b_count,n_count)
-    b_dic={}
-    n_dic={}
-    for i,v in zip(b_count.index,b_count):
-        b_dic[i]=v
-    for i,v in zip(n_count.index,n_count):
-        n_dic[i]=v
-    return render_template('statistic.html',boardgame=b_dic,nickname=n_dic)
+    # b_count=df.boardgame.value_counts()
+    # n_count=df.nickname.value_counts()
+    # print(b_count,n_count)
+    # b_dic={}
+    # n_dic={}
+    # for i,v in zip(b_count.index,b_count):
+    #     b_dic[i]=v
+    # for i,v in zip(n_count.index,n_count):
+    #     n_dic[i]=v
+    return render_template('statistic_main.html')
+
+@app.route('/statisticMember')
+def statistics_Members():
+
+    return render_template('statistic_member.html')
+
+@app.route('/statisticBoardgame')
+def statistics_Boardgames():
+
+    return render_template('statistic_boardgame.html')
+
+@app.route('/chartOverall',methods=['GET'])
+def chart_overall():
+    print('chart_overall()')
+    output = {'chart_game_play':db.chart_game_play()}
+    output['chart_member_attend']=db.chart_member_attend()
+    output['chart_member_play']=db.chart_member_play()
+    print(output)
+    res = make_response(jsonify(output),200)
+    return res
+
+@app.route('/chart_boardgame',methods=['GET'])
+def chart_boardgame():
+    print('chart_boardgame()')
+    output = {'chart_game_play':db.chart_game_play()}
+    output['chart_member_attend']=db.chart_member_attend()
+    output['chart_member_play']=db.chart_member_play()
+    print(output)
+    res = make_response(jsonify(output),200)
+    return res
 
 
 # host='0.0.0.0' => 내 ip접속 허용

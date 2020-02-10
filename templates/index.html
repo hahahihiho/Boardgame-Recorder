@@ -1,49 +1,264 @@
 {% extends 'base.html' %}
 
 {% block head %}
+
 <title>BoardGame Record</title>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
 {% endblock %}
 
 {% block body %}
-<div id="top-link">
-    <a href="/showall">기록보기</a>
-    <a href="/statistic">통계보기</a>
-</div>
 
 
-<hr>
-<form action="/" method="POST">
-    <table id="myTable">
-        <tr>
-            <input style="text-align: center;" type="date" name="date" id="date"><br>
-        </tr>
-        <tr>
-            <td><input type="text" name='boardgame'></td>
-            <td><input type="text" name='players' placeholder="김찰스,털업,촷..."></td>
-        </tr>
-    </table>
+		<!-- Begin Page Content -->
+		<div class="container-fluid">
 
-    <button type="button" onclick="myaddFunction()">add</button>
-    <button type="button" onclick="mydeleteFunction()">delete</button>
-    <br><input type="submit" value="기록">
-</form>
+			<!-- Page Heading -->
+			<div class="d-sm-flex align-items-center justify-content-between mb-4">
+				<h1 class="h3 mb-2 text-gray-800">기록,편집</h1>
+				<a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Download_excel(comming soon)</a>
+			</div>
+
+			<!-- DataTales Example -->
+			<div class="card shadow mb-4">
+				<div class="card-header py-3">
+					<h6 class="m-0 font-weight-bold text-primary">
+						<div>
+							날짜 : <input type="date" id="Date" onchange="send_date()"> <span id="Day"></span>
+						</div>
+					</h6>
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+							<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+								<thead>
+									<tr>
+										<th>seq</th>
+										<th>BoardGame</th>
+										<th>players</th>
+										<th>delete</th>
+										<th>up/down</th>
+									</tr>
+								</thead>
+								<tbody id = "dataTableBody">
+
+								</tbody>
+							</table>
+						</form>
+						<div id="record_data">
+							<input type="text" name='boardgame'>
+							<input type="text" name='players' placeholder="김찰스,털업,촷...">
+							<button type="button" onclick="addRecord()">add</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+		<!-- /.container-fluid -->
+
 
 {% endblock %}
 
 {% block script %}
 <script>
-    function myaddFunction() {
-        var table = document.getElementById("myTable");
-        var row = table.insertRow(-1);
-        var cell1 = row.insertCell(0);
-        var cell2 = row.insertCell(1);
-        cell1.innerHTML = "<td><input type='text' name='boardgame'></td>";
-        cell2.innerHTML = "<td><input type='text' name='players' placeholder='김찰스,털업,촷...'></td>";
-    }
-    function mydeleteFunction() {
-        document.getElementById("myTable").deleteRow(-1);
-    }
+
+	// send date and get record
+	function send_date(){
+		var date = document.getElementById('Date');
+		var entry = {
+			date: date.value,
+			// 0:sun -> 6:sat
+			day: date.valueAsDate.getDay()
+		};
+		fetch( `${window.origin}/date`, {
+				method: "POST",
+				credentials: "include",
+				body: JSON.stringify(entry),
+				cache: "no-cache",
+				headers: new Headers({
+						"content-type": "application/json"
+				})
+		}).then(function (response) {
+				if (response.status !== 200) {
+						console.log(`Response status was not 200: ${response.status}`);
+						return ;
+				};
+				response.json().then(function (data) {
+						document.getElementById('Day').innerHTML=data.day+"요일";
+						jsonToTable(data.table);
+						console.log(data);
+				});
+		});
+	};
+	// == end send_date ==
+
+	// add record data
+	function addRecord(){
+		var data = document.getElementById('record_data');
+		var table = document.getElementById('dataTableBody');
+		var table_length = table.querySelectorAll('tr').length;
+		var date = document.getElementById('Date');
+		var boardgame = data.querySelector("input[name='boardgame']");
+		var name_list = data.querySelector("input[name='players']");
+
+		if (date.value == "") {
+			alert("날짜를 입력해 주세요.")
+		}
+		else {
+			var entry = {
+				seq: table_length,
+				date: date.value,
+				gamename: boardgame.value,
+				name_list: name_list.value
+			};
+			fetch( `${window.origin}/addRecord`, {
+				method: "POST",
+				credentials: "include",
+				body: JSON.stringify(entry),
+				cache: "no-cache",
+				headers: new Headers({
+					"content-type": "application/json"
+				})
+			}).then(function (response){
+				if(response.status !== 200) {
+					console.log(`Response status was not 200: ${response.status}`);
+					return ;
+				};
+				response.json().then(function(data) {
+					boardgame.value='';
+					name_list.value='';
+					jsonToTable(data);
+				});
+			});
+		}
+	};
+	// == end addRecord() ==
+
+	//json to table
+	function jsonToTable(json_data){
+		var tablebody = document.getElementById('dataTableBody');
+		var last_seq = json_data.length-1;
+		var table_html = '';
+		for(var i=0; i<json_data.length; i++){
+			var seq = json_data[i]['seq']
+			table_html += '<tr>' +
+				'<td>'+seq + '</td>'+
+				'<td>'+json_data[i]['gamename']+'</td>'+
+				'<td>'+json_data[i]['name_list']+'</td>' +
+				'<td><button seq='+ seq + ' onclick="deleteRecord(event)">del</button></td>';
+			if(last_seq==0){ table_html += '<td></td>'
+			} else if(seq == 0){
+				table_html = table_html +
+				'<td><button seq='+seq+' onclick="downRecord(event)">▼</button></td>';
+			} else if(seq == last_seq){
+				table_html = table_html +
+				'<td><button seq='+seq+' onclick = "upRecord(event)">▲</button></td>';
+			} else {
+				table_html = table_html +
+				'<td><button seq='+seq+' onclick = "upRecord(event)">▲</button>'+
+				'<button seq='+seq+' onclick="downRecord(event)">▼</button></td>';
+			}
+			table_html += '</tr>';
+		};
+		tablebody.innerHTML=table_html;
+	};
+	// == end jsonToTable ==
+
+	// delete Record
+	function deleteRecord(event){
+		var date = document.getElementById('Date');
+		var del_seq = event.target.attributes.seq;
+		var entry = {
+			date: date.value,
+			seq: del_seq.value
+		};
+		fetch( `${window.origin}/delRecord`, {
+				method: "POST",
+				credentials: "include",
+				body: JSON.stringify(entry),
+				cache: "no-cache",
+				headers: new Headers({
+						"content-type": "application/json"
+				})
+		}).then(function (response) {
+				if (response.status !== 200) {
+						console.log(`Response status was not 200: ${response.status}`);
+						return ;
+				};
+				response.json().then(function (data) {
+						jsonToTable(data);
+						console.log(data);
+				});
+		});
+		
+	}
+	// == end deleteRecord ==
+
+	// up Record
+	function upRecord(e){
+		var date = document.getElementById('Date');
+		var seq = e.target.attributes.seq;
+		console.log(seq.value,seq.value+1,seq.value-1)
+		var entry = {
+			date: date.value,
+			seq1: seq.value,
+			seq2: parseInt(seq.value)-1
+		};
+		console.log(entry)
+		fetch( `${window.origin}/swapRecord`, {
+				method: "POST",
+				credentials: "include",
+				body: JSON.stringify(entry),
+				cache: "no-cache",
+				headers: new Headers({
+						"content-type": "application/json"
+				})
+		}).then(function (response) {
+				if (response.status !== 200) {
+						console.log(`Response status was not 200: ${response.status}`);
+						return ;
+				};
+				response.json().then(function (data) {
+						jsonToTable(data);
+						console.log(data);
+				});
+		});
+	}
+	// == end upRecord ==
+	// down Record
+	function downRecord(e){
+		var date = document.getElementById('Date');
+		var seq = e.target.attributes.seq;
+		var entry = {
+			date: date.value,
+			seq1: seq.value,
+			seq2: parseInt(seq.value)+1
+		};
+		console.log(entry)
+		fetch( `${window.origin}/swapRecord`, {
+				method: "POST",
+				credentials: "include",
+				body: JSON.stringify(entry),
+				cache: "no-cache",
+				headers: new Headers({
+						"content-type": "application/json"
+				})
+		}).then(function (response) {
+				if (response.status !== 200) {
+						console.log(`Response status was not 200: ${response.status}`);
+						return ;
+				};
+				response.json().then(function (data) {
+						jsonToTable(data);
+						console.log(data);
+				});
+		});
+	}
+	// == end downRecord ==
+
+
+
 </script>
 {% endblock %}
 

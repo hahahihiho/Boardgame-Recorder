@@ -1,10 +1,16 @@
 #dir
 .vscode/
 __pycache__/
+.pytest_cache
+boardgameRecord/
 
 # files
+_0_query.storage.py
 _1_controller.py
 _2_DB_csv.py
+_2_db_backup.py
 app_backup.py
 test.py
+test_2_db.py
 index_backup.html
+execute_server.bat

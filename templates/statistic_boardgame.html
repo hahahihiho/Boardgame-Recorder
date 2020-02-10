@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>statistics_game</title>
+{% endblock %}
+
+{% block body %}
+
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-2 text-gray-800">통계보기(게임별)</h1>
+            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+        </div>
+
+        <!-- DataTales Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <div>
+                        게임 플레이 횟수
+                    </div>
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="myChart1" width="undefine" height="undefine"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <div>
+                        모임 참가 횟수
+                    </div>
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-bar">
+                    <canvas id="myChart2"></canvas>
+                </div>
+                <hr>
+                hello
+            </div>
+        </div>
+
+
+    </div>
+    <!-- /.container-fluid -->
+
+
+
+{% endblock %}
+
+{% block script %}
+
+
+<script>
+
+    window.onload = function() {
+        var ctx1 = document.getElementById('myChart1').getContext('2d');
+        var ctx2 = document.getElementById('myChart2').getContext('2d');
+        
+        fetch( `${window.origin}/chartOverall`)
+		.then(function (response) {
+				if (response.status !== 200) {
+						console.log('There is status problem. STATUS : ',response.status);
+						return ;
+				};
+				response.json().then(function (data) {
+                        console.log(data);
+                        data1 = data.chart_game_play;
+                        data2 = data.chart_member_attend;
+                        data3 = data.chart_member_play;
+                        // drawlineChart();
+                        drawChart(ctx1,'doughnut',data1);
+                        drawChart(ctx2,'bar',data2);
+                        // drawChart(ctx3,'bar',data3);
+				});
+        });
+    }
+    Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+    Chart.defaults.global.defaultFontColor = '#858796';
+
+    function drawChart(ctx,type,data) {
+        var chart_overall = new Chart(ctx,{
+            type: type,
+            data: {
+                labels:data.keys,
+                datasets: [{
+                    label: data.columns,
+                    data: data.values,
+                    backgroundColor : [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ]
+
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+                },
+                scales: {
+                xAxes: [{
+                    time: {
+                    unit: 'month'
+                    },
+                    gridLines: {
+                    display: false,
+                    drawBorder: false
+                    },
+                    ticks: {
+                    maxTicksLimit: 6
+                    },
+                    maxBarThickness: 25,
+                }],
+                yAxes: [{
+                    ticks: {
+                    min: 0,
+                    maxTicksLimit: 5,
+                    padding: 10,
+                    callback: function(value, index, values) {
+                        return value;
+                    }
+                    },
+                    gridLines: {
+                    color: "rgb(234, 236, 244)",
+                    zeroLineColor: "rgb(234, 236, 244)",
+                    drawBorder: false,
+                    borderDash: [2],
+                    zeroLineBorderDash: [2]
+                    }
+                }],
+                },
+
+
+            }
+        });
+    }
+
+
+
+
+    
+</script>
+
+{% endblock %}
+
+    
