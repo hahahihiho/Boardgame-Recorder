@@ -36,7 +36,7 @@
 		1. View
 			* Responsive web design(반응형 웹 디자인)(bootstrap)
 		2. View < -- > Controller
-			* rest api (fetch,json)
+			* rest api (fetch(async,await),json)
 		3. Controller
 			* flask
 		4. Model
