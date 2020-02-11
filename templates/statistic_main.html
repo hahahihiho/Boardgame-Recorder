@@ -27,7 +27,7 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <canvas id="myChart1" width="undefine" height="undefine"></canvas>
+                    <canvas id="myChart1" width="400" height="400"></canvas>
                     
                 </div>
             </div>
@@ -41,10 +41,8 @@
                 </h6>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <canvas id="myChart2" width="undefine" height="undefine"></canvas>
+                    <canvas id="myChart2" width="400" height="400"></canvas>
                     
-                </div>
             </div>
         </div>
         <div class="card shadow mb-4">
@@ -56,10 +54,8 @@
                 </h6>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <canvas id="myChart3" width="undefine" height="undefine"></canvas>
+                    <canvas id="myChart3" width="400" height="400"></canvas>
                     
-                </div>
             </div>
         </div>
 
@@ -93,68 +89,16 @@
                         data2 = data.chart_member_attend;
                         data3 = data.chart_member_play;
                         // drawlineChart();
-                        drawDoughnutChart(ctx1,'doughnut',data1);
-                        drawChart(ctx2,'bar',data2);
-                        drawChart(ctx3,'bar',data3);
+                        data1['label'] = '플레이 횟수'
+                        data2['label'] = '참가횟수';
+                        data3['label'] = '플레이 횟수';
+                        drawHBarChart(ctx1,data1);
+                        drawHBarChart(ctx2,data2);
+                        drawHBarChart(ctx3,data3);
 				});
         });
     }
-    function drawDoughnutChart(ctx,type,data) {
-        var chart_overall = new Chart(ctx,{
-            type: type,
-            data: {
-                labels:data.keys,
-                datasets: [{
-                    label: data.columns,
-                    data: data.values,
-                    backgroundColor : [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ]
 
-                }]
-            },
-            options: {
-            }
-        });
-    }
-        
-    function drawChart(ctx,type,data) {
-        var chart_overall = new Chart(ctx,{
-            type: type,
-            data: {
-                labels:data.keys,
-                datasets: [{
-                    label: data.columns,
-                    data: data.values,
-                    backgroundColor : [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ]
-
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            }
-        });
-    }
-
-    
         // 차트
         // var ctx = document.getElementById('myChart').getContext('2d');
         // var myChart = new Chart(ctx, {

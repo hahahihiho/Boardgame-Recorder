@@ -7,13 +7,21 @@
 
 
     <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}"> -->
-    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/modal.css') }}"> -->
     <!-- Bootstrap core CSS -->
     <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"> -->
     <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet"> -->
 
+    <!-- Custom fonts for this template -->
+    <link href="https://blackrockdigital.github.io/startbootstrap-sb-admin-2/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+
     <!-- Custom styles for this template-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" >
+
+    <!-- mymodal -->
+    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/modal.css') }}"> -->
+
 
 
     {% block head %}{% endblock %}
@@ -22,7 +30,7 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion hidden-xs" id="accordionSidebar">
     
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
@@ -44,7 +52,7 @@
     
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="/statistic" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                <a class="nav-link collapsed" href="/statistic" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>통계보기</span>
                 </a>
@@ -84,11 +92,9 @@
                     <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
                             <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search fa-sm"></i>
+                            </button>
                         </div>
                     </form>
     
@@ -145,9 +151,29 @@
     </div>
 
 </body>
-<!-- <script type="text/javascript" src="{{ url_for('static', filename='js/modal.js') }}"></script> -->
 <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+
+<!-- Bootstrap core JavaScript-->
+<script src="https://blackrockdigital.github.io/startbootstrap-sb-admin-2/vendor/jquery/jquery.min.js"></script>
+<script src="https://blackrockdigital.github.io/startbootstrap-sb-admin-2/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="https://blackrockdigital.github.io/startbootstrap-sb-admin-2/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="https://blackrockdigital.github.io/startbootstrap-sb-admin-2/js/sb-admin-2.min.js"></script>
+
+
 <script src = "https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/drawHBarChart.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/drawDoughnutChart.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/drawlineChart.js') }}"></script>
+
+<!-- <script type="text/javascript" src="{{ url_for('static', filename='js/modal.js') }}"></script> -->
+
+
+
 {% block script %}{% endblock %}
 
 </html>

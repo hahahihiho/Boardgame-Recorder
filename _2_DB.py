@@ -1,5 +1,5 @@
 import sqlite3
-
+import numpy as np
 
 db_path = './db/boardgame.sql'
 # BMM = 'BOARDGAME_MEMBER_MAPPER'
@@ -76,7 +76,7 @@ def createTable():
 
     cur.execute(sql)
 
-# I made it for study, but it is not useful when deleting the record
+# I made it for study, but it is not useful and problem when deleting the record
     # BOARDGAME_MEMBER_MAPPER
     # sql = '''
     # CREATE TABLE IF NOT EXISTS {table1}_{table2}_MAPPER (
@@ -96,8 +96,8 @@ def createTable():
     conn.commit()
     conn.close()
 
-# sql connect decorator(Return)
-def connectSqlr(f):
+# sql connect decorator(Rjson,Return,no return)
+def connectSqlRjson(f):
     def function(*args, **kwargs):
         conn=sqlite3.connect(db_path)
         cur=conn.cursor()
@@ -122,6 +122,70 @@ def connectSqlr(f):
         return result
     return function
 
+# return
+def connectSqlr(f):
+    def function(*args, **kwargs):
+        conn=sqlite3.connect(db_path)
+        cur=conn.cursor()
+        conn.execute('pragma foreign_keys=ON')
+
+        sql = f(*args, **kwargs)
+        sql_list = sql.split(';')
+        for query in sql_list:
+            # try:
+            print(query)
+            cur.execute(query)
+            # except:
+            #     raise ValueError(query)
+        result = {}
+        result['columns']=[_[0] for _ in cur.description]
+        query_result = cur.fetchall()
+        query_result = np.array(query_result).T
+        print(result['columns'],query_result)
+        print(query_result.shape)
+        if query_result.shape[0] == len(result['columns']):
+            for i,_ in enumerate(result['columns']):
+                result[_] = list(query_result[i])
+        else :
+            for i,_ in enumerate(result['columns']):
+                result[_] = []
+        print(result)
+        conn.commit()
+        conn.close()
+        return result
+    return function
+
+def connectSqlRmonth(f):
+    def function(*args, **kwargs):
+        conn=sqlite3.connect(db_path)
+        cur=conn.cursor()
+        conn.execute('pragma foreign_keys=ON')
+
+        sql = f(*args, **kwargs)
+        sql_list = sql.split(';')
+        for query in sql_list:
+            # try:
+            # print(query)
+            cur.execute(query)
+            # except:
+            #     raise ValueError(query)
+        result = {}
+        result['columns']=[_[0] for _ in cur.description]
+        query_result = cur.fetchall()
+        
+        ## None 값을 가지고 있을 시 0으로 초기화
+        if query_result[0][0]==None:
+            result['value']=[0]*12
+        ## tuple to list [()] -> []
+        else:        
+            result['value'] = list(query_result[0])
+        # print(result)
+
+        conn.commit()
+        conn.close()
+        return result
+    return function
+
 # No Return
 def connectSql(f):
     def function(*args, **kwargs):
@@ -141,6 +205,8 @@ def connectSql(f):
         conn.commit()
         conn.close()
     return function
+
+### end decorator
 
 # insert row
 def insertData(data):
@@ -228,12 +294,30 @@ def showDateTable(data):
 
     return json
 
+### select ###
 @connectSqlr
 def selectFromRecord(data):
     sql='''
     select * from RECORD WHERE date = {date}
     '''.format(date=data['date'])
     return sql
+
+@connectSqlr
+def selectAllBoardgame():
+    sql = 'select name from BOARDGAME ORDER BY name ASC'
+    return sql
+
+@connectSqlr
+def selectAllMember():
+    sql = 'select name from MEMBER ORDER BY name ASC'
+    return sql
+
+@connectSqlr
+def selectAllYear():
+    sql = 'select strftime("%Y",date) AS year from RECORD GROUP BY year ORDER BY year ASC'
+    return sql
+
+### end select ###
 
 # 합쳐서 구현.. 나눠서 보기좋게 효율적으로 구현할 방법은..
 # @connectSql
@@ -287,7 +371,10 @@ def swapRecordSeq(data):
 ### member, game manager ###
 @connectSql
 def deleteBoardgame(data):
-    pass
+    sql = '''
+    DELETE FROM BOARDGAME WHERE name = '{game_name}'
+    '''.format(name = data['game_name'])
+    return sql
 
 @connectSql
 def deleteMember(data):
@@ -297,8 +384,8 @@ def deleteMember(data):
     return sql
 ### end ###
 
-### ChartData ###
-@connectSqlr
+### /statistic ChartData ###
+@connectSqlRjson
 def chart_game_play():
     sql = '''
     SELECT B.name,COUNT(RBM.game_id) AS game_freq FROM RECORD_BOARDGAME_MAPPER AS RBM
@@ -308,7 +395,7 @@ def chart_game_play():
     '''
     return sql
 
-@connectSqlr
+@connectSqlRjson
 def chart_member_attend():
     sql = '''
     SELECT M.name,COUNT(M.member_id) AS MEM_ATT FROM (
@@ -324,7 +411,7 @@ def chart_member_attend():
     '''
     return sql
 
-@connectSqlr
+@connectSqlRjson
 def chart_member_play():
     sql = '''
     SELECT M.name,COUNT(RMM.member_id) AS mem_play FROM RECORD_MEMBER_MAPPER AS RMM
@@ -333,8 +420,67 @@ def chart_member_play():
     ORDER BY mem_play DESC
     '''
     return sql
+### END ###
 
-@connectSqlr
+# def list_to_tuple_str(l):
+#     return '("'+'","'.join(l)+'")'
+
+### /statistic_boardgame Chart ###
+@connectSqlRmonth
+def chart_game_everymonth_fixedyear(data):
+    sql = '''
+    SELECT 
+        SUM(CASE strftime('%m',R.date) WHEN '01' THEN 1 ELSE 0 END) AS January,
+        SUM(CASE WHEN strftime('%m',R.date) = '02' THEN 1 ELSE 0 END) AS Februrary,
+        SUM(CASE WHEN strftime('%m',R.date) = '03' THEN 1 ELSE 0 END) AS March,
+        SUM(CASE WHEN strftime('%m',R.date) = '04' THEN 1 ELSE 0 END) AS April,
+        SUM(CASE WHEN strftime('%m',R.date) = '05' THEN 1 ELSE 0 END) AS May,
+        SUM(CASE WHEN strftime('%m',R.date) = '06' THEN 1 ELSE 0 END) AS June,
+        SUM(CASE WHEN strftime('%m',R.date) = '07' THEN 1 ELSE 0 END) AS July,
+        SUM(CASE WHEN strftime('%m',R.date) = '08' THEN 1 ELSE 0 END) AS August,
+        SUM(CASE WHEN strftime('%m',R.date) = '09' THEN 1 ELSE 0 END) AS September,
+        SUM(CASE WHEN strftime('%m',R.date) = '10' THEN 1 ELSE 0 END) AS October,
+        SUM(CASE WHEN strftime('%m',R.date) = '11' THEN 1 ELSE 0 END) AS November,
+        SUM(CASE WHEN strftime('%m',R.date) = '12' THEN 1 ELSE 0 END) AS December
+    FROM RECORD AS R
+        LEFT JOIN RECORD_BOARDGAME_MAPPER AS RBM
+        ON R.record_id = RBM.record_id
+        LEFT JOIN BOARDGAME AS B
+        ON RBM.game_id = B.game_id
+    WHERE B.name = '{game_name}' AND strftime('%Y',R.date) = '{year}'
+    '''.format(game_name = data['game_name'],year = data['year'])
+    return sql
+
+@connectSqlRmonth
+def chart_member_everymonth_fixedyear(data):
+    sql = '''
+    SELECT 
+        SUM(CASE strftime('%m',R.date) WHEN '01' THEN 1 ELSE 0 END) AS January,
+        SUM(CASE WHEN strftime('%m',R.date) = '02' THEN 1 ELSE 0 END) AS Februrary,
+        SUM(CASE WHEN strftime('%m',R.date) = '03' THEN 1 ELSE 0 END) AS March,
+        SUM(CASE WHEN strftime('%m',R.date) = '04' THEN 1 ELSE 0 END) AS April,
+        SUM(CASE WHEN strftime('%m',R.date) = '05' THEN 1 ELSE 0 END) AS May,
+        SUM(CASE WHEN strftime('%m',R.date) = '06' THEN 1 ELSE 0 END) AS June,
+        SUM(CASE WHEN strftime('%m',R.date) = '07' THEN 1 ELSE 0 END) AS July,
+        SUM(CASE WHEN strftime('%m',R.date) = '08' THEN 1 ELSE 0 END) AS August,
+        SUM(CASE WHEN strftime('%m',R.date) = '09' THEN 1 ELSE 0 END) AS September,
+        SUM(CASE WHEN strftime('%m',R.date) = '10' THEN 1 ELSE 0 END) AS October,
+        SUM(CASE WHEN strftime('%m',R.date) = '11' THEN 1 ELSE 0 END) AS November,
+        SUM(CASE WHEN strftime('%m',R.date) = '12' THEN 1 ELSE 0 END) AS December
+    FROM RECORD AS R
+        LEFT JOIN RECORD_MEMBER_MAPPER AS RMM
+        ON R.record_id = RMM.record_id
+        LEFT JOIN MEMBER AS M
+        ON RMM.member_id = M.member_id
+    WHERE M.name = '{member_name}' AND strftime('%Y',R.date) = '{year}'
+    '''.format(member_name = data['member_name'],year = data['year'])
+    return sql
+
+### END ###
+
+
+### /statistic_member Chart ###
+@connectSqlRjson
 def chart_member(data):
     sql = '''
     SELECT strftime("%Y-%m",date) AS YEAR_MONTH,COUNT(M.name) FROM RECORD AS R
@@ -346,9 +492,6 @@ def chart_member(data):
     GROUP BY YEAR_MONTH
     '''.format(name=data['name'])
     return sql
-
-
-
 
 ### end ###
 

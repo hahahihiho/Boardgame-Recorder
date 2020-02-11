@@ -12,41 +12,76 @@
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-2 text-gray-800">통계보기(게임별)</h1>
-            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+            <h1 class="h3 mb-2 text-gray-800">통계보기(년도별,게임별)</h1>
+            <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
         </div>
 
-        <!-- DataTales Example -->
+        <!-- Chart Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    년도 선택
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id = "whichYear" class="col-sm-12 row">
+                    {% for i in range(1,5) %}
+                        <div class="col-sm-3">
+                            {% for year in year_list %}
+                                {% if loop.index%5 == i %}
+                                    <label>
+                                        <input type="radio" onclick="chooseYear(event)" name="year" value="{{year}}"> {{year}}
+                                    </label>
+                                    <br>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    게임선택
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="game_list_div" class="col-sm-12 row">
+                    {% for i in range(1,5) %}
+                        <div class="col-sm-3">
+                            {% for game_name in game_list %}
+                                {% if loop.index%5 == i %}
+                                <label>
+                                    <input type="checkbox" onclick="chooseGame(event)" name="{{game_name}}">
+                                    {{game_name}}
+                                </label>
+                                <br>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
                     <div>
-                        게임 플레이 횟수
+                        월별 플레이 횟수
                     </div>
                 </h6>
             </div>
             <div class="card-body">
                 <div class="chart">
-                    <canvas id="myChart1" width="undefine" height="undefine"></canvas>
+                    <canvas id="myChart1" width="100" height="50"></canvas>
                 </div>
             </div>
         </div>
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">
-                    <div>
-                        모임 참가 횟수
-                    </div>
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="chart-bar">
-                    <canvas id="myChart2"></canvas>
-                </div>
-                <hr>
-                hello
-            </div>
-        </div>
+
 
 
     </div>
@@ -60,103 +95,101 @@
 
 
 <script>
-
-    window.onload = function() {
-        var ctx1 = document.getElementById('myChart1').getContext('2d');
-        var ctx2 = document.getElementById('myChart2').getContext('2d');
-        
-        fetch( `${window.origin}/chartOverall`)
-		.then(function (response) {
-				if (response.status !== 200) {
-						console.log('There is status problem. STATUS : ',response.status);
-						return ;
-				};
-				response.json().then(function (data) {
-                        console.log(data);
-                        data1 = data.chart_game_play;
-                        data2 = data.chart_member_attend;
-                        data3 = data.chart_member_play;
-                        // drawlineChart();
-                        drawChart(ctx1,'doughnut',data1);
-                        drawChart(ctx2,'bar',data2);
-                        // drawChart(ctx3,'bar',data3);
-				});
-        });
-    }
-    Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
-    Chart.defaults.global.defaultFontColor = '#858796';
-
-    function drawChart(ctx,type,data) {
-        var chart_overall = new Chart(ctx,{
-            type: type,
+    var which_year;
+    var game_list = [];
+    var ctx = document.getElementById('myChart1').getContext('2d');
+    // chart 선언
+    var chart = new Chart(ctx, {
+            type: 'line',
+            // The data for our dataset
             data: {
-                labels:data.keys,
-                datasets: [{
-                    label: data.columns,
-                    data: data.values,
-                    backgroundColor : [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ]
-
-                }]
+                labels: ['January', 'February', 'March', 'April','May','June','July','August','September','October','November','December'],
+                datasets: []
             },
-            options: {
-                maintainAspectRatio: false,
-                layout: {
-                padding: {
-                    left: 10,
-                    right: 25,
-                    top: 25,
-                    bottom: 0
-                }
-                },
-                scales: {
-                xAxes: [{
-                    time: {
-                    unit: 'month'
-                    },
-                    gridLines: {
-                    display: false,
-                    drawBorder: false
-                    },
-                    ticks: {
-                    maxTicksLimit: 6
-                    },
-                    maxBarThickness: 25,
-                }],
-                yAxes: [{
-                    ticks: {
-                    min: 0,
-                    maxTicksLimit: 5,
-                    padding: 10,
-                    callback: function(value, index, values) {
-                        return value;
-                    }
-                    },
-                    gridLines: {
-                    color: "rgb(234, 236, 244)",
-                    zeroLineColor: "rgb(234, 236, 244)",
-                    drawBorder: false,
-                    borderDash: [2],
-                    zeroLineBorderDash: [2]
-                    }
-                }],
-                },
-
-
+            options:{
             }
         });
+
+    function chooseYear(e){
+        which_year = e.target.attributes.value.value;
     }
 
+    async function chooseGame(e){
+        let game_list_div = document.getElementById('game_list_div');
+        let game_name;
+        // 체크되면
+        if (e.target.checked == true){
+            game_name = e.target.attributes.name.value;
+        // 체크해제
+        }else {
+            // game_list, chart에서 제거
+            let del_value = e.target.attributes.name.value;
+            let del_index = game_list.indexOf(del_value);
+            game_list.splice(del_index,1)
+            chart.data.datasets.splice(del_index,1)
+            chart.update();
+        }
 
+        // year값 x or game_name값 x
+        if(which_year==null | game_name==null){}
+        // year값 o, game_name값 o
+        else{
+            let entry = {
+                year: which_year,
+                game_name:game_name
+            }
+            let url = `${window.origin}/statistic/dataset/game_year`
+            // async로 부터 res 값 받아옴
+            let res = restApiP(url,entry)
+            let data = await res;
+            // list에 담고 dataset으로 전환
+            game_list.push(data.game_name);
+            let dataset = data_to_chart_dataset(data);
+            // chart update (add dataset)
+            chart.data.datasets.push(dataset);
+            chart.update();
+        }
+    }
 
+    async function restApiP(url,entry){
+        let response = await fetch( url,{
+            method: "POST",
+            credentials: "include",
+            body: JSON.stringify(entry),
+            cache: "no-cache",
+            headers: new Headers({
+                "content-type": "application/json"
+            })
+        });
+        if (response.status !== 200) {
+            console.log('There is status problem. STATUS : ',response.status);
+            return ;
+        };
+        let data = await response.json()
+            console.log('in',data)
+        return data;
+    }
 
-    
+    function data_to_chart_dataset(data){
+        let dataset = {
+            type:'line',
+            label: data.game_name,
+            fill : false,         // 채우기 없음
+            lineTension : 0.2,  // 0이면 꺾은선 그래프, 숫자가 높을수록 둥글해짐
+            pointRadius : 0,    // 각 지점에 포인트 주지 않음
+            borderColor: gencolor(),
+            data: data.value
+        };
+        return dataset;
+    }
+
+    function gencolor(){
+        let r = Math.floor(Math.random()*255);
+        let g = Math.floor(Math.random()*255);
+        let b = Math.floor(Math.random()*255);
+        return 'rgba('+r+','+g+','+b+','+0.4+')';
+    }
+
 </script>
 
 {% endblock %}

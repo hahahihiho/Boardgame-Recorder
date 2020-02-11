@@ -75,56 +75,33 @@ def swap_Record():
     res = make_response(jsonify(output),200)
     return res
 
-@app.route('/showall', methods=['GET','POST'])
-def showall():
-    if request.method == 'GET':
-        createTable()
-        table = selectAllSQL()
-        return render_template('record_view.html',table=table)
+# @app.route('/showall', methods=['GET','POST'])
+# def showall():
+#     if request.method == 'GET':
+#         createTable()
+#         table = selectAllSQL()
+#         return render_template('record_view.html',table=table)
 
-    elif request.method=='POST':
-        # 고객정보 수정,삭제
-        req = request.form
-        idx = req.get('idx')
-        date = req.get('date')
-        boardgame = req.get('boardgame')
-        nickname = req.get('players')
-        action = request.form.get('action')
-        if action == 'update':
-            data = [date,boardgame,nickname,idx]
-            updateSQL(data)
-        else :
-            deleteSQL(idx)
+#     elif request.method=='POST':
+#         # 고객정보 수정,삭제
+#         req = request.form
+#         idx = req.get('idx')
+#         date = req.get('date')
+#         boardgame = req.get('boardgame')
+#         nickname = req.get('players')
+#         action = request.form.get('action')
+#         if action == 'update':
+#             data = [date,boardgame,nickname,idx]
+#             updateSQL(data)
+#         else :
+#             deleteSQL(idx)
 
-        return redirect('/showall')
+#         return redirect('/showall')
 
 # 통계 페이지
 @app.route('/statistic')
 def statistics():
-    # data=selectAllSQL()
-    # df = pd.DataFrame(data,columns=['idx','date','boardgame','nickname'])
-    # print(df)
-
-    # b_count=df.boardgame.value_counts()
-    # n_count=df.nickname.value_counts()
-    # print(b_count,n_count)
-    # b_dic={}
-    # n_dic={}
-    # for i,v in zip(b_count.index,b_count):
-    #     b_dic[i]=v
-    # for i,v in zip(n_count.index,n_count):
-    #     n_dic[i]=v
     return render_template('statistic_main.html')
-
-@app.route('/statisticMember')
-def statistics_Members():
-
-    return render_template('statistic_member.html')
-
-@app.route('/statisticBoardgame')
-def statistics_Boardgames():
-
-    return render_template('statistic_boardgame.html')
 
 @app.route('/chartOverall',methods=['GET'])
 def chart_overall():
@@ -132,9 +109,18 @@ def chart_overall():
     output = {'chart_game_play':db.chart_game_play()}
     output['chart_member_attend']=db.chart_member_attend()
     output['chart_member_play']=db.chart_member_play()
-    print(output)
+    # print(output)
     res = make_response(jsonify(output),200)
     return res
+
+# statistic_boardgame
+@app.route('/statisticBoardgame')
+def statistics_Boardgames():
+    output = db.selectAllBoardgame()
+    game_list = output['name']
+    year_list = db.selectAllYear()
+    year_list = year_list['year']
+    return render_template('statistic_boardgame.html',game_list=game_list,year_list=year_list)
 
 @app.route('/chart_boardgame',methods=['GET'])
 def chart_boardgame():
@@ -146,7 +132,42 @@ def chart_boardgame():
     res = make_response(jsonify(output),200)
     return res
 
+@app.route('/statistic/dataset/game_year',methods=['POST'])
+def checked_game_list():
+    req = request.get_json()
+    print('checked_game_list\n',req)
+    output = db.chart_game_everymonth_fixedyear(req)
+    output['game_name'] = req['game_name']
+    print(output)
+    res = make_response(jsonify(output),200)
+    return res
+
+### statistic member
+
+@app.route('/statisticMember')
+def statistics_Members():
+    output = db.selectAllMember()
+    member_list = output['name']
+    year_list = db.selectAllYear()
+    year_list = year_list['year']
+    return render_template('statistic_member.html',member_list=member_list,year_list=year_list)
+
+    
+
+@app.route('/statistic/dataset/member_year',methods=['POST'])
+def checked_member_list():
+    req = request.get_json()
+    print('checked_member_list\n',req)
+    output = db.chart_member_everymonth_fixedyear(req)
+    output['member_name'] = req['member_name']
+    print(output)
+    res = make_response(jsonify(output),200)
+    return res
+
+
+
+
 
 # host='0.0.0.0' => 내 ip접속 허용
 if __name__=='__main__':
-    app.run(debug=True)
+    app.run(host = '0.0.0.0',debug=True)
