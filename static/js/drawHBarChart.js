@@ -29,9 +29,9 @@ function drawHBarChart(ctx,data) {
             },
             scales: {
                 xAxes: [{
-                    time: {
-                    unit: 'month'
-                    },
+                    // time: {
+                    // unit: 'month'
+                    // },
                     ticks: {
                         min: 0,
                         stepsize:1,

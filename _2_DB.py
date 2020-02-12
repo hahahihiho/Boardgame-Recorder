@@ -296,13 +296,6 @@ def showDateTable(data):
 
 ### select ###
 @connectSqlr
-def selectFromRecord(data):
-    sql='''
-    select * from RECORD WHERE date = {date}
-    '''.format(date=data['date'])
-    return sql
-
-@connectSqlr
 def selectAllBoardgame():
     sql = 'select name from BOARDGAME ORDER BY name ASC'
     return sql
@@ -316,8 +309,47 @@ def selectAllMember():
 def selectAllYear():
     sql = 'select strftime("%Y",date) AS year from RECORD GROUP BY year ORDER BY year ASC'
     return sql
-
 ### end select ###
+### manage page
+@connectSqlr
+def selectMemberPlay():
+    sql = '''
+    SELECT M.name,COUNT(RMM.record_id) AS N_of_play FROM MEMBER AS M
+        LEFT JOIN RECORD_MEMBER_MAPPER AS RMM
+        ON M.member_id = RMM.member_id
+    GROUP BY M.name
+    ORDER BY N_of_play DESC,M.name ASC
+    '''
+    return sql
+
+@connectSqlr
+def selectGamePlay():
+    sql = '''
+    SELECT B.name,COUNT(RBM.record_id) AS N_of_play FROM BOARDGAME AS B
+        LEFT JOIN RECORD_BOARDGAME_MAPPER AS RBM
+        ON B.game_id = RBM.game_id
+    GROUP BY B.name
+    ORDER BY B.name ASC
+    '''
+    return sql
+
+### end
+
+### delete member, game ###
+@connectSql
+def deleteBoardgame(data):
+    sql = '''
+    DELETE FROM BOARDGAME WHERE name = '{name}'
+    '''.format(name = data['game_name'])
+    return sql
+
+@connectSql
+def deleteMember(data):
+    sql = '''
+    DELETE FROM MEMBER WHERE name = '{name}'
+    '''.format(name = data['name'])
+    return sql
+### end ###
 
 # 합쳐서 구현.. 나눠서 보기좋게 효율적으로 구현할 방법은..
 # @connectSql
@@ -365,22 +397,6 @@ def swapRecordSeq(data):
     END
     WHERE date = '{date}' AND seq IN ({seq1},{seq2})
     '''.format(date = data['date'],seq1 = data['seq1'],seq2 = data['seq2'])
-    return sql
-### end ###
-
-### member, game manager ###
-@connectSql
-def deleteBoardgame(data):
-    sql = '''
-    DELETE FROM BOARDGAME WHERE name = '{game_name}'
-    '''.format(name = data['game_name'])
-    return sql
-
-@connectSql
-def deleteMember(data):
-    sql = '''
-    DELETE FROM MEMBER WHERE name = '{name}'
-    '''.format(name = data['name'])
     return sql
 ### end ###
 
@@ -479,25 +495,17 @@ def chart_member_everymonth_fixedyear(data):
 ### END ###
 
 
-### /statistic_member Chart ###
-@connectSqlRjson
-def chart_member(data):
-    sql = '''
-    SELECT strftime("%Y-%m",date) AS YEAR_MONTH,COUNT(M.name) FROM RECORD AS R
-        LEFT JOIN RECORD_MEMBER_MAPPER AS RMM
-        ON R.record_id = RMM.record_id
-        LEFT JOIN MEMBER AS M
-        ON RMM.member_id = M.member_id
-    WHERE M.name = '{name}'
-    GROUP BY YEAR_MONTH
-    '''.format(name=data['name'])
-    return sql
-
-### end ###
 
 #################################
 ########### FOR TEST ############
 #################################
+@connectSqlr
+def selectFromRecord(data):
+    sql='''
+    select * from RECORD WHERE date = {date}
+    '''.format(date=data['date'])
+    return sql
+
 def selectTable(table_name):
     conn=sqlite3.connect(db_path)
     cur=conn.cursor()

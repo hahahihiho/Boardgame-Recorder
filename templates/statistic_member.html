@@ -110,10 +110,6 @@
             }
         });
 
-    function chooseYear(e){
-        which_year = e.target.attributes.value.value;
-    }
-
     async function chooseMember(e){
         let member_list_div = document.getElementById('member_list_div');
         let member_name;
@@ -151,25 +147,6 @@
         }
     }
 
-    async function restApiP(url,entry){
-        let response = await fetch( url,{
-            method: "POST",
-            credentials: "include",
-            body: JSON.stringify(entry),
-            cache: "no-cache",
-            headers: new Headers({
-                "content-type": "application/json"
-            })
-        });
-        if (response.status !== 200) {
-            console.log('There is status problem. STATUS : ',response.status);
-            return ;
-        };
-        let data = await response.json()
-            console.log('in',data)
-        return data;
-    }
-
     function data_to_chart_dataset(data){
         let dataset = {
             type:'line',
@@ -183,12 +160,6 @@
         return dataset;
     }
 
-    function gencolor(){
-        let r = Math.floor(Math.random()*255);
-        let g = Math.floor(Math.random()*255);
-        let b = Math.floor(Math.random()*255);
-        return 'rgba('+r+','+g+','+b+','+0.4+')';
-    }
 
 </script>
 

@@ -31,16 +31,16 @@
 
 	// add record data
 	function addRecord(){
-		var data = document.getElementById('record_data');
+		var date = document.getElementById('Date');
 		var table = document.getElementById('dataTableBody');
 		var table_length = table.querySelectorAll('tr').length;
-		var date = document.getElementById('Date');
+		var data = document.getElementById('record_data');
 		var boardgame = data.querySelector("input[name='boardgame']");
 		var name_list = data.querySelector("input[name='players']");
 
 		if (date.value == "") {
 			alert("날짜를 입력해 주세요.")
-		}
+		}else if(boardgame.value==''|name_list==''){}
 		else {
 			var entry = {
 				seq: table_length,

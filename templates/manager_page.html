@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+<title>BoardGame Record</title>
+
+{% endblock %}
+
+{% block body %}
+
+
+		<!-- Begin Page Content -->
+		<div class="container-fluid">
+
+			<!-- Page Heading -->
+			<div class="d-sm-flex align-items-center justify-content-between mb-4">
+				<h1 class="h3 mb-2 text-gray-800">관리페이지</h1>
+				<!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Download_excel(comming soon)</a> -->
+			</div>
+
+            <div class="row col-md-12">
+			    <!-- card1 -->
+                <div class="card shadow mb-4 col-md-5">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            맴버관리
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>이름</th>
+                                        <th>#play</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in member_table %}
+                                        <tr>
+                                            {% for value in row %}
+                                                <td>{{value}}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- card1 -->
+                <!-- card2 -->
+                <div class="card shadow mb-4 col-md-6 offset-md-1">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            게임관리
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable">
+                                <thead>
+                                    <tr>
+                                        <th>게임</th>
+                                        <th>#play</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in game_table %}
+                                        <tr>
+                                            {% for value in row %}
+                                                <td>{{value}}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- card2 -->
+            </div>
+            <!-- row -->
+
+
+		</div>
+		<!-- /.container-fluid -->
+
+
+{% endblock %}
+
+{% block script %}
+
+
+{% endblock %}
+
+    

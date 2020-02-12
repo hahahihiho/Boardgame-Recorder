@@ -5,12 +5,10 @@
 # title: 보드게임 기록
 ########################
 # ***Brief Description***
-# 보드게임 record를 flask로 web에 구현
-# insert,update,delete,date-search,show-statistics 기능 구현
-# virtualenv or venv 와 gunicorn을 이용하여 heruko에 배포
+# readme.md 로 대체
 #
 # *** study more ***
-# ERD 바탕으로 db 모델링 최적화..
+# Mongo.DB 사용..
 ########################
 
 
@@ -19,19 +17,18 @@ import sqlite3
 import os
 import _2_DB as db
 import pandas as pd
+import numpy as np
 
 app=Flask(__name__)
 db_path = './db/boardgame.sql'
 if not os.path.exists(db_path):
     db.createTable()
 
-# app
-# record page
+### record page
 @app.route('/',methods=['GET'])
 def main():
     table = []
     return render_template('index.html',table=table)
-
 
 @app.route('/date',methods=['POST'])
 def get_date():
@@ -75,30 +72,8 @@ def swap_Record():
     res = make_response(jsonify(output),200)
     return res
 
-# @app.route('/showall', methods=['GET','POST'])
-# def showall():
-#     if request.method == 'GET':
-#         createTable()
-#         table = selectAllSQL()
-#         return render_template('record_view.html',table=table)
 
-#     elif request.method=='POST':
-#         # 고객정보 수정,삭제
-#         req = request.form
-#         idx = req.get('idx')
-#         date = req.get('date')
-#         boardgame = req.get('boardgame')
-#         nickname = req.get('players')
-#         action = request.form.get('action')
-#         if action == 'update':
-#             data = [date,boardgame,nickname,idx]
-#             updateSQL(data)
-#         else :
-#             deleteSQL(idx)
-
-#         return redirect('/showall')
-
-# 통계 페이지
+### statistic main
 @app.route('/statistic')
 def statistics():
     return render_template('statistic_main.html')
@@ -113,7 +88,7 @@ def chart_overall():
     res = make_response(jsonify(output),200)
     return res
 
-# statistic_boardgame
+### statistic_boardgame
 @app.route('/statisticBoardgame')
 def statistics_Boardgames():
     output = db.selectAllBoardgame()
@@ -121,16 +96,6 @@ def statistics_Boardgames():
     year_list = db.selectAllYear()
     year_list = year_list['year']
     return render_template('statistic_boardgame.html',game_list=game_list,year_list=year_list)
-
-@app.route('/chart_boardgame',methods=['GET'])
-def chart_boardgame():
-    print('chart_boardgame()')
-    output = {'chart_game_play':db.chart_game_play()}
-    output['chart_member_attend']=db.chart_member_attend()
-    output['chart_member_play']=db.chart_member_play()
-    print(output)
-    res = make_response(jsonify(output),200)
-    return res
 
 @app.route('/statistic/dataset/game_year',methods=['POST'])
 def checked_game_list():
@@ -152,7 +117,6 @@ def statistics_Members():
     year_list = year_list['year']
     return render_template('statistic_member.html',member_list=member_list,year_list=year_list)
 
-    
 
 @app.route('/statistic/dataset/member_year',methods=['POST'])
 def checked_member_list():
@@ -164,6 +128,21 @@ def checked_member_list():
     res = make_response(jsonify(output),200)
     return res
 
+### manage
+@app.route('/manage')
+def manage_page():
+    member_play = db.selectMemberPlay()
+    a = np.array(member_play['name'])
+    b = np.array(member_play['N_of_play'])
+    c = np.concatenate((a,b),axis=0)
+    member_table = np.reshape(c,(-1,2),order='F')
+    print(member_table)
+    game_play = db.selectGamePlay()
+    a = np.array(game_play['name'])
+    b = np.array(game_play['N_of_play'])
+    c = np.concatenate((a,b),axis=0)
+    game_table = np.reshape(c,(-1,2),order='F')
+    return render_template('manager_page.html',member_table = member_table,game_table = game_table)
 
 
 
