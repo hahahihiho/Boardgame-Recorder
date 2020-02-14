@@ -1,6 +1,10 @@
 # boardgame recorder(web)
 
+###  App page
+* https://flaskcrudboardgameapp2.herokuapp.com/
+
 ## What I use
+
 * server
 	
 	* python, python-library(flask)
@@ -13,7 +17,7 @@
 	  > /templates(html) , /static(js,css)
 * db
 	
-	* sqlite
+	* sqlite3
 	
 	  > /db
 * virtualenv
@@ -34,7 +38,11 @@
 4. make functions
 	* View < -- > Controller < -- > Model < -- > db
 		1. View
+			* Record data
+			* date->result(async)
 			* Responsive web design(반응형 웹 디자인)(bootstrap)
+			* autocompete
+			* Chart(ajax(fetch))
 		2. View < -- > Controller
 			* rest api (fetch(async,await),json)
 		3. Controller
@@ -46,4 +54,4 @@
 
 
 ## deployed page
-on the heroku [page](https://flaskcrudboardgameapp2.herokuapp.com/)
+from gunicorn on the heroku [page](https://flaskcrudboardgameapp2.herokuapp.com/)

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>statistics_member</title>
+{% endblock %}
+
+{% block body %}
+
+
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-2 text-gray-800">통계보기(게임별)</h1>
+            <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
+        </div>
+
+        <!-- Chart Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    기간 선택
+                </h6>
+            </div>
+            <div class="card-body">
+                <div style="display: inline-flex;flex-wrap:wrap;align-items: flex-end; ">
+                    <div>
+                        <div>시작</div>
+                        <div><input type="date" style="margin-right:10px;" id="start_date"></div>
+                    </div>
+                    <div>
+                        <div>종료</div>
+                        <div><input type="date" style="margin-right:10px" id="end_date"></div>
+                    </div>
+                    <div><input type="button" id='start_end_button' value="search"></div>
+                </div>
+            </div>
+        </div>        
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <div>
+                        게임별 플레이 횟수
+                    </div>
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <canvas id="myChart1"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <!-- /.container-fluid -->
+
+
+
+{% endblock %}
+
+{% block script %}
+
+
+<script>
+    var ctx = document.getElementById('myChart1').getContext('2d');
+    // chart 선언
+    var chart = initPieChart(ctx);
+
+    var start_end_button = document.getElementById('start_end_button');
+    start_end_button.addEventListener('click',function(e){
+        let url = '/periodic/boardgame';
+        let start_date = document.getElementById('start_date');
+        let end_date = document.getElementById('end_date');
+        entry = {
+            start_date:start_date.value,
+            end_date:end_date.value
+        }
+        restApiP(url,entry).then(function(data){
+            chart.data.labels = data.keys;
+            chart.data.datasets[0].data = data.label;
+            chart.data.datasets[0].data = data.values;
+            chart.update();
+            console.log(data)
+        })
+    })
+
+
+</script>
+
+{% endblock %}
+
+    

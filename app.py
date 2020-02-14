@@ -108,7 +108,6 @@ def checked_game_list():
     return res
 
 ### statistic member
-
 @app.route('/statisticMember')
 def statistics_Members():
     output = db.selectAllMember()
@@ -144,6 +143,60 @@ def manage_page():
     game_table = np.reshape(c,(-1,2),order='F')
     return render_template('manager_page.html',member_table = member_table,game_table = game_table)
 
+### autocomplete_list
+@app.route('/members')
+def member_list():
+    output = db.selectAllMember()
+    res = make_response(jsonify(output['name']),200)
+    return res
+
+@app.route('/boardgames')
+def game_list():
+    output = db.selectAllBoardgame()
+    res = make_response(jsonify(output['name']),200)
+    return res
+
+### periodic
+@app.route('/statistic/periodic/boardgame')
+def statistic_periodic_boardgame():
+    return render_template('periodic_boardgame.html')
+
+@app.route('/statistic/periodic/member')
+def statistic_periodic_member():
+    return render_template('periodic_member.html')
+#### form
+@app.route('/periodic/member',methods=['POST'])
+def get_start_end_date_from_member():
+    req = request.get_json()
+    print(req)
+    start_date = req['start_date']
+    end_date = req['end_date']
+    if start_date=='' or end_date=='':
+        return 'empty'
+    elif end_date<start_date:
+        return 'correct date order'
+    # correct
+    else:
+        output = db.members_attendtime_from_certain_period(req)
+        print(output)
+        res = make_response(jsonify(output), 200)
+        return res
+
+@app.route('/periodic/boardgame',methods=['POST'])
+def get_start_end_date_from_boardgame():
+    req = request.get_json()
+    start_date = req['start_date']
+    end_date = req['end_date']
+    if start_date=='' or end_date=='':
+        return 'empty'
+    elif end_date<start_date:
+        return 'correct date order'
+    # correct
+    else:
+        output = db.boardgames_playtime_from_certain_period(req)
+        print(output)
+        res = make_response(jsonify(output), 200)
+        return res
 
 
 

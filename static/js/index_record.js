@@ -1,36 +1,23 @@
 
 	// send date and get record
-	function send_date(){
+	async function send_date(){
 		var date = document.getElementById('Date');
 		var entry = {
 			date: date.value,
 			// 0:sun -> 6:sat
 			day: date.valueAsDate.getDay()
 		};
-		fetch( `${window.origin}/date`, {
-				method: "POST",
-				credentials: "include",
-				body: JSON.stringify(entry),
-				cache: "no-cache",
-				headers: new Headers({
-						"content-type": "application/json"
-				})
-		}).then(function (response) {
-				if (response.status !== 200) {
-						console.log(`Response status was not 200: ${response.status}`);
-						return ;
-				};
-				response.json().then(function (data) {
-						document.getElementById('Day').innerHTML=data.day+"요일";
-						jsonToTable(data.table);
-						console.log(data);
-				});
-		});
+
+		let url = `${window.origin}/date`;
+		let data = await restApiP(url,entry);
+		document.getElementById('Day').innerHTML=data.day+"요일";
+		jsonToTable(data.table);
+
 	};
 	// == end send_date ==
 
 	// add record data
-	function addRecord(){
+	async function addRecord(){
 		var date = document.getElementById('Date');
 		var table = document.getElementById('dataTableBody');
 		var table_length = table.querySelectorAll('tr').length;
@@ -48,25 +35,12 @@
 				gamename: boardgame.value,
 				name_list: name_list.value
 			};
-			fetch( `${window.origin}/addRecord`, {
-				method: "POST",
-				credentials: "include",
-				body: JSON.stringify(entry),
-				cache: "no-cache",
-				headers: new Headers({
-					"content-type": "application/json"
-				})
-			}).then(function (response){
-				if(response.status !== 200) {
-					console.log(`Response status was not 200: ${response.status}`);
-					return ;
-				};
-				response.json().then(function(data) {
-					boardgame.value='';
-					name_list.value='';
-					jsonToTable(data);
-				});
-			});
+			let url = `${window.origin}/addRecord`;
+			let data = await restApiP(url,entry);
+			boardgame.value='';
+			name_list.value='';
+			jsonToTable(data)
+			
 		}
 	};
 	// == end addRecord() ==
@@ -102,37 +76,21 @@
 	// == end jsonToTable ==
 
 	// delete Record
-	function deleteRecord(event){
+	async function deleteRecord(event){
 		var date = document.getElementById('Date');
 		var del_seq = event.target.attributes.seq;
 		var entry = {
 			date: date.value,
 			seq: del_seq.value
 		};
-		fetch( `${window.origin}/delRecord`, {
-				method: "POST",
-				credentials: "include",
-				body: JSON.stringify(entry),
-				cache: "no-cache",
-				headers: new Headers({
-						"content-type": "application/json"
-				})
-		}).then(function (response) {
-				if (response.status !== 200) {
-						console.log(`Response status was not 200: ${response.status}`);
-						return ;
-				};
-				response.json().then(function (data) {
-						jsonToTable(data);
-						console.log(data);
-				});
-		});
-		
+		let url = `${window.origin}/delRecord`;
+		let data = await restApiP(url,entry);
+		jsonToTable(data)
 	}
 	// == end deleteRecord ==
 
 	// up Record
-	function upRecord(e){
+	async function upRecord(e){
 		var date = document.getElementById('Date');
 		var seq = e.target.attributes.seq;
 		console.log(seq.value,seq.value+1,seq.value-1)
@@ -142,28 +100,13 @@
 			seq2: parseInt(seq.value)-1
 		};
 		console.log(entry)
-		fetch( `${window.origin}/swapRecord`, {
-				method: "POST",
-				credentials: "include",
-				body: JSON.stringify(entry),
-				cache: "no-cache",
-				headers: new Headers({
-						"content-type": "application/json"
-				})
-		}).then(function (response) {
-				if (response.status !== 200) {
-						console.log(`Response status was not 200: ${response.status}`);
-						return ;
-				};
-				response.json().then(function (data) {
-						jsonToTable(data);
-						console.log(data);
-				});
-		});
+		let url = `${window.origin}/swapRecord`;
+		let data = await restApiP(url,entry);
+		jsonToTable(data)
 	}
 	// == end upRecord ==
 	// down Record
-	function downRecord(e){
+	async function downRecord(e){
 		var date = document.getElementById('Date');
 		var seq = e.target.attributes.seq;
 		var entry = {
@@ -172,23 +115,9 @@
 			seq2: parseInt(seq.value)+1
 		};
 		console.log(entry)
-		fetch( `${window.origin}/swapRecord`, {
-				method: "POST",
-				credentials: "include",
-				body: JSON.stringify(entry),
-				cache: "no-cache",
-				headers: new Headers({
-						"content-type": "application/json"
-				})
-		}).then(function (response) {
-				if (response.status !== 200) {
-						console.log(`Response status was not 200: ${response.status}`);
-						return ;
-				};
-				response.json().then(function (data) {
-						jsonToTable(data);
-						console.log(data);
-				});
-		});
+		let url = `${window.origin}/swapRecord`;
+		let data = await restApiP(url,entry);
+		jsonToTable(data)
+
 	}
 	// == end downRecord ==

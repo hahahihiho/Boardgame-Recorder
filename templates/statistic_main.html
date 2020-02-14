@@ -72,6 +72,11 @@
         var ctx2 = document.getElementById('myChart2').getContext('2d');
         var ctx3 = document.getElementById('myChart3').getContext('2d');
         
+        // restApiG(`${window.origin}/chartOverall`)
+        // async () => {
+        //     let url = `${window.origin}/chartOverall`;
+        //     restApiG(url)
+        // }
         fetch( `${window.origin}/chartOverall`)
 		.then(function (response) {
 				if (response.status !== 200) {

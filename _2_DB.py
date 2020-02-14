@@ -494,6 +494,34 @@ def chart_member_everymonth_fixedyear(data):
 
 ### END ###
 
+### periodic
+@connectSqlRjson
+def members_attendtime_from_certain_period(data):
+    sql = '''
+    SELECT M.name,COUNT(M.member_id) AS MEM_ATT FROM (
+        SELECT * FROM RECORD AS R
+            LEFT JOIN RECORD_MEMBER_MAPPER AS RMM ON R.record_id = RMM.record_id
+        GROUP BY R.date,RMM.member_id
+    ) AS subT
+    LEFT JOIN MEMBER AS M ON subT.member_id = M.member_id
+    WHERE subT.date BETWEEN '{start_date}' AND '{end_date}'
+    GROUP BY M.member_id
+    ORDER BY MEM_ATT DESC
+    '''.format(start_date=data['start_date'],end_date=data['end_date'])
+    return sql
+
+@connectSqlRjson
+def boardgames_playtime_from_certain_period(data):
+    sql = '''
+    SELECT B.name,COUNT(RBM.game_id) AS game_freq FROM RECORD AS R
+        LEFT JOIN RECORD_BOARDGAME_MAPPER AS RBM ON R.record_id = RBM.record_id
+        LEFT JOIN BOARDGAME AS B ON RBM.game_id = B.game_id  
+    WHERE R.date BETWEEN '{start_date}' AND '{end_date}'
+    GROUP BY RBM.game_id
+    ORDER BY game_freq DESC
+    '''.format(start_date=data['start_date'],end_date=data['end_date'])
+    return sql
+
 
 
 #################################

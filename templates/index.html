@@ -44,12 +44,17 @@
 
 							</tbody>
 						</table>
-						<div id="record_data">
-							<input type="text" name='boardgame' placeholder="boardgame">
-							<input type="text" name='players' placeholder="player1,player2,player3...">
-							<button type="button" onclick="addRecord()">add</button>
-						</div>
 					</div>
+					<div id="record_data">
+						<span class="autocomplete">
+							<input type="text" autocomplete="off" name='boardgame' placeholder="boardgame">
+						</span>
+						<span class="autocomplete">
+							<input type="text" autocomplete="off" name='players' placeholder="player1,player2,player3...">
+						</span>
+						<button type="button" onclick="addRecord()">add</button>
+					</div>
+					
 				</div>
 			</div>
 
@@ -63,6 +68,18 @@
 {% block script %}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/index_record.js') }}"></script>
+<script>
+	
+	var data = document.getElementById('record_data');
+	var boardgame = data.querySelector("input[name='boardgame']");
+	var name_list = data.querySelector("input[name='players']");
+	// console.dir(data)
+
+	restApiG('/boardgames').then(res => autocomplete(boardgame,res))
+	restApiG('/members').then(res => autocompleteComma(name_list,res))
+
+
+</script>
 
 {% endblock %}
 

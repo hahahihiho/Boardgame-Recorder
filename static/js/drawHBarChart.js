@@ -34,7 +34,7 @@ function drawHBarChart(ctx,data) {
                     // },
                     ticks: {
                         min: 0,
-                        stepsize:1,
+                        stepSize:1,
                         maxTicksLimit: 10
                     },
                     maxBarThickness: 25,

@@ -48,13 +48,13 @@
                 </h6>
             </div>
             <div class="card-body">
-                <div id="game_list_div" class="col-sm-12 row">
+                <div id="checkbox_list_div" class="col-sm-12 row">
                     {% for i in range(1,5) %}
                         <div class="col-sm-3">
                             {% for game_name in game_list %}
                                 {% if loop.index%5 == i %}
                                 <label>
-                                    <input type="checkbox" onclick="chooseGame(event)" name="{{game_name}}">
+                                    <input type="checkbox" onclick="chooseGame(event)" name='checkbox' value="{{game_name}}">
                                     {{game_name}}
                                 </label>
                                 <br>
@@ -77,7 +77,7 @@
             </div>
             <div class="card-body">
                 <div class="chart">
-                    <canvas id="myChart1" width="100" height="50"></canvas>
+                    <canvas id="myChart1" width="400" height="200"></canvas>
                 </div>
             </div>
         </div>
@@ -95,31 +95,23 @@
 
 
 <script>
-    var which_year;
+    
     var game_list = [];
     var ctx = document.getElementById('myChart1').getContext('2d');
     // chart 선언
-    var chart = new Chart(ctx, {
-            type: 'line',
-            // The data for our dataset
-            data: {
-                labels: ['January', 'February', 'March', 'April','May','June','July','August','September','October','November','December'],
-                datasets: []
-            },
-            options:{
-            }
-        });
+    var chart = initLineMonthChart(ctx);
+
 
     async function chooseGame(e){
         // let game_list_div = document.getElementById('game_list_div');
         let game_name;
         // 체크되면
         if (e.target.checked == true){
-            game_name = e.target.attributes.name.value;
+            game_name = e.target.attributes.value.value;
         // 체크해제
         }else {
             // game_list, chart에서 제거
-            let del_value = e.target.attributes.name.value;
+            let del_value = e.target.attributes.value.value;
             let del_index = game_list.indexOf(del_value);
             game_list.splice(del_index,1)
             chart.data.datasets.splice(del_index,1)
@@ -138,26 +130,16 @@
             // async로 부터 res 값 받아옴
             let res = restApiP(url,entry)
             let data = await res;
-            // list에 담고 dataset으로 전환
+            // 키값 변경후 list에 담기
+            data.label = data.game_name;
+            delete data.game_name;
             game_list.push(data.game_name);
+            // dataset으로 전환
             let dataset = data_to_chart_dataset(data);
             // chart update (add dataset)
             chart.data.datasets.push(dataset);
             chart.update();
         }
-    }
-
-    function data_to_chart_dataset(data){
-        let dataset = {
-            type:'line',
-            label: data.game_name,
-            fill : false,         // 채우기 없음
-            lineTension : 0.2,  // 0이면 꺾은선 그래프, 숫자가 높을수록 둥글해짐
-            pointRadius : 0,    // 각 지점에 포인트 주지 않음
-            borderColor: gencolor(),
-            data: data.value
-        };
-        return dataset;
     }
 
 

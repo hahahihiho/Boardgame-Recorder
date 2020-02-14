@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
 
-    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}"> -->
     <!-- Bootstrap core CSS -->
     <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"> -->
     <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet"> -->
@@ -18,6 +17,9 @@
 
     <!-- Custom styles for this template-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sb-admin-2.min.css') }}" >
+    
+    <!-- autocomplete.css -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/autocomplete.css') }}" >
 
     <!-- mymodal -->
     <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/modal.css') }}"> -->
@@ -60,8 +62,10 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">statistics:</h6>
                         <a class="collapse-item" href="/statistic">Overall</a>
-                        <a class="collapse-item" href="/statisticMember">Members</a>
-                        <a class="collapse-item" href="/statisticBoardgame">Boardgames</a>
+                        <a class="collapse-item" href="/statisticMember">Year/Members</a>
+                        <a class="collapse-item" href="/statisticBoardgame">Year/Boardgames</a>
+                        <a class="collapse-item" href="/statistic/periodic/boardgame">Period/Boardgame</a>
+                        <a class="collapse-item" href="/statistic/periodic/member">Period/Member</a>
                     </div>
                 </div>
             </li>
@@ -98,10 +102,12 @@
                     <!-- Topbar Search -->
                     <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
-                            <button class="btn btn-primary" type="button">
-                                <i class="fas fa-search fa-sm"></i>
-                            </button>
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." id="GGsearch" aria-label="Search" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button" onclick="searchOnGoogle()">
+                                    <i class="fas fa-search fa-sm"></i>
+                                </button>
+                            </div>
                         </div>
                     </form>
     
@@ -170,16 +176,29 @@
 <!-- Custom scripts for all pages-->
 <script src="https://blackrockdigital.github.io/startbootstrap-sb-admin-2/js/sb-admin-2.min.js"></script>
 
+<!-- autocomplete
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
 
+<!-- Chart.js -->
 <script src = "https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 
+<script type="text/javascript" src="{{ url_for('static', filename='js/restApi.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/drawHBarChart.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/statistic_M_B.js') }}"></script>
-<!-- <script type="text/javascript" src="{{ url_for('static', filename='js/drawDoughnutChart.js') }}"></script> -->
+<script type="text/javascript" src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/drawPieChart.js') }}"></script>
 <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/drawlineChart.js') }}"></script> -->
 
 <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/modal.js') }}"></script> -->
-
+<script>
+    function searchOnGoogle(){
+        url = "https://www.google.com/search?q=";
+        query = document.getElementById('GGsearch').value;
+        location.href = url + query;
+    }
+    
+</script>
 
 
 {% block script %}{% endblock %}
