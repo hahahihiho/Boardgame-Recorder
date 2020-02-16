@@ -13,7 +13,6 @@ app_backup.py
 test.py
 test_2_db.py
 index_backup.html
-execute_server.bat
 modal_backup.html
 drawDoughnutChart.js
 drawLineChart.js

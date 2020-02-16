@@ -17,35 +17,6 @@ function chooseYear(e){
 }
 
 
-function initLineMonthChart(ctx){
-    let chart = new Chart(ctx, {
-        type: 'line',
-        // The data for our dataset
-        data: {
-            // labels: ['January', 'February', 'March', 'April','May','June','July','August','September','October','November','December'],
-            labels: ['Jan', 'Feb', 'Mar', 'Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            datasets: []
-        },
-        options:{
-            responsive: true,
-            scales: {
-				yAxes: [{
-					ticks: {
-                        min: 0,
-                        stepSize: 1,
-                        maxTicksLimit: 10
-					}
-				}]
-            },
-            legend: {
-                display: true,
-                position: 'top'
-            }
-        }
-    });
-    return chart;
-}
-
 function data_to_chart_dataset(data){
     let dataset = {
         type:'line',

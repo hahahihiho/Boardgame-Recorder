@@ -248,7 +248,7 @@ def insertData(data):
             FROM RECORD,MEMBER
             WHERE RECORD.date = '{date}' AND RECORD.seq = {seq}
                 AND MEMBER.name = '{name}'
-        '''.format(date=data['date'], seq=data['seq'], name=name)
+        '''.format(date=data['date'], seq=data['seq'], name=name.strip())
 
         sql_list = sql.split(';')
         for query in sql_list:
