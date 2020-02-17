@@ -3,6 +3,9 @@
 ###  App page
 * https://flaskcrudboardgameapp2.herokuapp.com/
 
+## How to use
+* Download zip file -> unpack .zip file -> start_server.bat -> boardgame_page.html
+
 ## What I use
 
 * server
