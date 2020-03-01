@@ -25,8 +25,8 @@
                     </div>
                 </h6>
             </div>
-            <div class="card-body">
-                <canvas id="myChart1" width="400" height="400"></canvas>
+            <div class="card-body chart">
+                <canvas id="myChart1" ></canvas>
             </div>
         </div>
         <div class="card shadow mb-4">
@@ -37,7 +37,7 @@
                     </div>
                 </h6>
             </div>
-            <div class="card-body">
+            <div class="card-body chart">
                 <canvas id="myChart2" width="400" height="400"></canvas>
             </div>
         </div>
@@ -49,7 +49,7 @@
                     </div>
                 </h6>
             </div>
-            <div class="card-body">
+            <div class="card-body charth">
                 <canvas id="myChart3" width="400" height="400"></canvas>
             </div>
         </div>
@@ -72,77 +72,24 @@
         var ctx2 = document.getElementById('myChart2').getContext('2d');
         var ctx3 = document.getElementById('myChart3').getContext('2d');
         
-        // restApiG(`${window.origin}/chartOverall`)
-        // async () => {
-        //     let url = `${window.origin}/chartOverall`;
-        //     restApiG(url)
-        // }
-        fetch( `${window.origin}/chartOverall`)
-		.then(function (response) {
-				if (response.status !== 200) {
-						console.log('There is status problem. STATUS : ',response.status);
-						return ;
-				};
-				response.json().then(function (data) {
-                        console.log(data);
-                        data1 = data.chart_game_play;
-                        data2 = data.chart_member_attend;
-                        data3 = data.chart_member_play;
-                        // drawlineChart();
-                        data1['label'] = '플레이 횟수'
-                        data2['label'] = '참가횟수';
-                        data3['label'] = '플레이 횟수';
-                        drawHBarChart(ctx1,data1);
-                        drawHBarChart(ctx2,data2);
-                        drawHBarChart(ctx3,data3);
-				});
-        });
+
+        url = `${window.origin}/chartOverall`;
+        let res = restApiG(url);
+        res.then(function(data){
+            data1 = data.chart_game_play;
+            data2 = data.chart_member_attend;
+            data3 = data.chart_member_play;
+            // drawlineChart();
+            data1['label'] = '플레이 횟수'
+            data2['label'] = '참가횟수';
+            data3['label'] = '플레이 횟수';
+            drawHBarChart(ctx1,data1);
+            drawHBarChart(ctx2,data2);
+            drawHBarChart(ctx3,data3);
+        })
+
     }
-
-        // 차트
-        // var ctx = document.getElementById('myChart').getContext('2d');
-        // var myChart = new Chart(ctx, {
-        //     type: 'bar',
-        //     data: {
-        //         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        //         datasets: [{
-        //             label: '# of Votes',
-        //             data: [12, 19, 3, 5, 2, 3],
-        //             backgroundColor: [
-        //                 'rgba(255, 99, 132, 0.2)',
-        //                 'rgba(54, 162, 235, 0.2)',
-        //                 'rgba(255, 206, 86, 0.2)',
-        //                 'rgba(75, 192, 192, 0.2)',
-        //                 'rgba(153, 102, 255, 0.2)',
-        //                 'rgba(255, 159, 64, 0.2)'
-        //             ],
-        //             borderColor: [
-        //                 'rgba(255, 99, 132, 1)',
-        //                 'rgba(54, 162, 235, 1)',
-        //                 'rgba(255, 206, 86, 1)',
-        //                 'rgba(75, 192, 192, 1)',
-        //                 'rgba(153, 102, 255, 1)',
-        //                 'rgba(255, 159, 64, 1)'
-        //             ],
-        //             borderWidth: 1
-        //         }]
-        //     },
-        //     options: {
-        //         scales: {
-        //             yAxes: [{
-        //                 ticks: {
-        //                     beginAtZero: true
-        //                 }
-        //             }]
-        //         }
-        //     }
-        // });
-    
-
-
-
-
-    
+ 
 </script>
 
 {% endblock %}
