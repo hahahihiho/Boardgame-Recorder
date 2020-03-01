@@ -390,7 +390,7 @@ def swapRecordSeq(data):
     # WHERE date = '{date}' AND seq IN ({seq1},{seq2})
     # '''.format(date = data['date'],seq1 = data['seq1'],seq2 = data['seq2'])
     sql = '''
-    UPDATE RECORD AS R
+    UPDATE RECORD
     SET seq = CASE seq
         WHEN {seq1} THEN {seq2}
         WHEN {seq2} THEN {seq1}
